@@ -1,31 +1,21 @@
 fx_version 'cerulean'
 game 'gta5'
 
-name 'qb-hud'
-description 'qb-hud for fivem, uses library from loading.io'
-author 'CosmoKramer'
-
-ui_page 'html/ui.html'
-
-files {
-    'html/ui.html',
-    'html/script.js',
-    'html/style.css',
-    'html/loading-bar.js',
-    'html/nitrous.png',
-    'html/buckle.ogg',
-    'html/unbuckle.ogg',
-    'html/seatBelt_off.png'
-}
+description 'QB-HUD'
+version '2.0.0'
 
 shared_scripts {
-    '@qb-core/import.lua',
-    'config.lua'
+    'config.lua',
+	'@qb-core/import.lua'
 }
 
-client_scripts {
-    'client/client.lua',
-    'client/stress.lua',
-}
+client_script 'client.lua'
+server_script 'server.lua'
 
-server_script 'server/server.lua'
+ui_page 'html/index.html'
+
+files {
+	'html/index.html',
+	'html/styles.css',
+	'html/app.js'
+}

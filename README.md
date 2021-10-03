@@ -1,8 +1,24 @@
-# QBCore Framework
-qb-hud heavily modified by MisterBuzzee and Obtaizen
+# qb-hud
+My edit of qb-hud
 
-# Screenshot
-![Screenshot_1](https://user-images.githubusercontent.com/57309415/134582207-2508d462-bf19-447d-9693-27f23f9d7816.png)
+![image](https://cdn.izmystic.gay/images/bbfjvfvu.png)
 
-![Screenshot_2](https://user-images.githubusercontent.com/57309415/134582225-e4d8e1eb-29e8-47fe-8c47-03cc85b65728.png)
+Color Palette: https://quasar.dev/style/color-palette
 
+# License
+
+    QBCore Framework
+    Copyright (C) 2021 Joshua Eger
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>
