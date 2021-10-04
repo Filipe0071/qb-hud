@@ -102,23 +102,35 @@ const moneyHud = Vue.createApp({
 const playerHud = {
     data() {
         return {
+            id: 0,
+            voice: 0,
+            radio: 0,
             health: 0,
             armor: 0,
             hunger: 0,
             thirst: 0,
             stress: 0,
-            voice: 0,
-            radio: 0,
+            oxygen: 0,
+            nos: 0,
+            seatbelt: 0,
+            fuel: 0,
             show: false,
+            showID: true,
             talking: false,
             showVoice: true,
             showHealth: true,
             showArmor: true,
             showHunger: true,
+            showBleed: true,
             showThirst: true,
             showStress: true,
-            voiceIcon: "far fa-microphone",
-            talkingColor: "#868686",
+            showOxygen: true,
+            showNos: true,
+            showBelt: true,
+            voiceIcon: "fas fa-microphone",
+            talkingColor: "#ffffff",
+            seatbeltColor: "",
+            seatbeltIcon: "fas fa-user"
         };
     },
     destroyed() {
@@ -135,15 +147,27 @@ const playerHud = {
         hudTick(data) {
             this.show = data.show;
             this.health = data.health;
+            this.id = data.id;
             this.armor = data.armor;
             this.hunger = data.hunger;
             this.thirst = data.thirst;
+            this.bleed = data.bleed;
             this.stress = data.stress;
+            this.oxygen = data.oxygen;
+            this.nos = data.nos;
+            this.seatbelt = data.seatbelt;
+            this.fuel = data.fuel;
+            this.speed = data.speed;
             this.voice = data.voice;
             this.talking = data.talking;
             this.radio = data.radio;
+            if (data.talking) {
+                this.talkingColor = "#ae47ff";
+            } else {
+                this.talkingColor = "#ffffff";
+            }
             if (data.health >= 100) {
-                this.showHealth = false;
+                this.showHealth = true;
             } else {
                 this.showHealth = true;
             }
@@ -153,29 +177,51 @@ const playerHud = {
                 this.showArmor = true;
             }
             if (data.hunger >= 100) {
-                this.showHunger = false;
+                this.showHunger = true;
             } else {
                 this.showHunger = true;
             }
             if (data.thirst >= 100) {
-                this.showThirst = false;
+                this.showThirst = true;
             } else {
                 this.showThirst = true;
             }
+            if (data.bleed <= 0) {
+                this.showBleed = false;
+            } else {
+                this.showBleed = true;
+            }
             if (data.stress <= 0) {
                 this.showStress = false;
-              } else {
-                this.showStress = true;
-              }
-            if (data.talking) {
-                this.talkingColor = "#FFFF00";
             } else {
-                this.talkingColor = "#868686";
+                this.showStress = true;
+            }
+            if (data.oxygen <= 0) {
+                this.showOxygen = false;
+            } else {
+                this.showOxygen = true;
+            }
+            if (data.nos === 0 || data.nos === undefined) {
+                this.showNos = false;
+            } else {
+                this.showNos = true;
+            }
+            if (data.seatbelt === true) {
+                this.showBelt = true;
+                this.seatbeltIcon = 'fas fa-user-slash';
+                this.seatbeltColor = "#00b95d";
+            } else {
+                this.showBelt = true;
+                this.seatbeltIcon = 'fas fa-user';
+                this.seatbeltColor = "#f41a12";
+            }
+            if (data.seatbelt === 0) {
+                this.showBelt = false;
             }
             if (data.radio != 0 && data.radio != undefined) {
-                this.voiceIcon = 'far fa-headset';
+                this.voiceIcon = 'fas fa-headset';
             } else if (data.radio == 0 || data.radio == undefined) {
-                this.voiceIcon = 'far fa-microphone';
+                this.voiceIcon = 'fas fa-microphone';
             }
         },
     },
@@ -189,16 +235,12 @@ app.mount("#ui-container");
 const vehHud = {
     data() {
         return {
-            nos: 0,
-            fuel: 0,
             show: false,
+            fuel: 0,
             speed: 0,
             street1: "",
             street2: "",
-            showNos: false,
-            seatbelt: 0,
             direction: "",
-            seatbeltColor: "",
         };
     },
     destroyed() {
@@ -219,19 +261,6 @@ const vehHud = {
             this.street1 = data.street1;
             this.street2 = data.street2;
             this.fuel = data.fuel;
-            this.nos = data.nos;
-            if (data.seatbelt === true) {
-                this.seatbelt = 1;
-                this.seatbeltColor = "#28a745";
-            } else {
-                this.seatbelt = 0;
-                this.seatbeltColor = "#DC143C";
-            }
-            if (data.nos === 0 || data.nos === undefined) {
-                this.showNos = false;
-            } else {
-                this.showNos = true;
-            }
             if (data.isPaused === 1) {
                 this.show = false;
             }

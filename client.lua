@@ -3,6 +3,7 @@ local seatbeltOn = false
 local cruiseOn = false
 local radarActive = false
 local nos = 0
+local bleedingPercentage = 0
 local stress = 0
 local hunger = 100
 local thirst = 100
@@ -54,25 +55,49 @@ Citizen.CreateThread(function()
         if isLoggedIn then
             local show = true
             local player = PlayerPedId()
+            local vehicle = GetVehiclePedIsIn(player)
             local talking = NetworkIsPlayerTalking(PlayerId())
             local voice = 0
+
+            local pid = GetPlayerServerId(PlayerId())
+
+            if IsPedSwimmingUnderWater(player) then
+                oxygen = GetPlayerUnderwaterTimeRemaining(PlayerId()) * 10
+            else
+                oxygen = 0
+            end
+
+            if IsPedInAnyVehicle(player) then
+                nos = nos
+                seatbelt = seatbeltOn
+            else
+                nos = 0
+                seatbelt = 0
+            end
+
             if LocalPlayer.state['proximity'] ~= nil then
                 voice = LocalPlayer.state['proximity'].distance
             end
+
             if IsPauseMenuActive() then
                 show = false
             end
             SendNUIMessage({
                 action = 'hudtick',
                 show = show,
+                id = pid,
+                voice = voice,
+                radio = LocalPlayer.state['radioChannel'],
+                talking = talking,
                 health = GetEntityHealth(player) - 100,
                 armor = GetPedArmour(player),
                 thirst = thirst,
+                bleed = bleedingPercentage,
                 hunger = hunger,
                 stress = stress,
-                voice = voice,
-                radio = LocalPlayer.state['radioChannel'],
-                talking = talking
+                oxygen = oxygen,
+                nos = nos,
+                seatbelt = seatbelt
             })
         else
             SendNUIMessage({
@@ -96,9 +121,9 @@ Citizen.CreateThread(function()
                 DisplayRadar(true)
                 radarActive = true
                 local pos = GetEntityCoords(player)
-                local speed = GetEntitySpeed(vehicle) * 2.236936
                 local street1, street2 = GetStreetNameAtCoord(pos.x, pos.y, pos.z, Citizen.ResultAsInteger(), Citizen.ResultAsInteger())
                 local fuel = exports['LegacyFuel']:GetFuel(vehicle)
+                local speed = math.ceil(GetEntitySpeed(vehicle) * 2.236936)
                 SendNUIMessage({
                     action = 'car',
                     show = true,
@@ -106,9 +131,7 @@ Citizen.CreateThread(function()
                     direction = GetDirectionText(GetEntityHeading(player)),
                     street1 = GetStreetNameFromHashKey(street1),
                     street2 = GetStreetNameFromHashKey(street2),
-                    seatbelt = seatbeltOn,
-                    speed = math.ceil(speed),
-                    nos = nos,
+                    speed = speed,
                     fuel = fuel
                 })
             else
@@ -138,21 +161,34 @@ function GetDirectionText(heading)
     end
 end
 
--- Raise Minimap
+-- Map stuff below
+local x = -0.025
+local y = -0.015
+local w = 0.16
+local h = 0.25
+
 Citizen.CreateThread(function()
-    local minimap = RequestScaleformMovie('minimap')
-    while not HasScaleformMovieLoaded(minimap) do
-        Wait(0)
-    end
+    local minimap = RequestScaleformMovie("minimap")
+    RequestStreamedTextureDict("circlemap", false)
+    while not HasStreamedTextureDictLoaded("circlemap") do Wait(100) end
+    AddReplaceTexture("platform:/textures/graphics", "radarmasksm", "circlemap", "radarmasksm")
     
-    SetMinimapComponentPosition('minimap', 'L', 'B', -0.0045, -0.012, 0.150, 0.188888)
-    SetMinimapComponentPosition('minimap_mask', 'L', 'B', 0.020, 0.022, 0.111, 0.159)
-    SetMinimapComponentPosition('minimap_blur', 'L', 'B', -0.03, 0.012, 0.266, 0.237)
-    
+    SetMinimapClipType(1)
+    SetMinimapComponentPosition('minimap', 'L', 'B', x, y, w, h)
+    SetMinimapComponentPosition('minimap_mask', 'L', 'B', x + 0.17, y + 0.09, 0.072, 0.162)
+    SetMinimapComponentPosition('minimap_blur', 'L', 'B', -0.035, -0.03, 0.18, 0.22)
     Wait(5000)
     SetRadarBigmapEnabled(true, false)
     Wait(0)
     SetRadarBigmapEnabled(false, false)
+    while true do
+        Wait(0)
+        BeginScaleformMovieMethod(minimap, "SETUP_HEALTH_ARMOUR")
+        ScaleformMovieMethodAddParamInt(3)
+        EndScaleformMovieMethod()
+        BeginScaleformMovieMethod(minimap, 'HIDE_SATNAV')
+        EndScaleformMovieMethod()
+    end
 end)
 
 -- Money HUD
@@ -288,5 +324,27 @@ function GetEffectInterval(stresslevel)
 end
 
 RegisterCommand('ui-r', function()
-    isLoggedIn = true 
-  end)
+    isLoggedIn = true
+end)
+
+
+CreateThread(function()
+    while true do
+        if isLoggedIn then
+            QBCore.Functions.TriggerCallback('hospital:GetPlayerBleeding', function(playerBleeding)
+                if playerBleeding == 0 then
+                    bleedingPercentage = 0
+                elseif playerBleeding == 1 then
+                    bleedingPercentage = 25
+                elseif playerBleeding == 2 then
+                    bleedingPercentage = 50
+                elseif playerBleeding == 3 then
+                    bleedingPercentage = 75
+                elseif playerBleeding == 4 then
+                    bleedingPercentage = 100
+                end
+            end)
+        end
+        Wait(2500)
+    end
+end)
